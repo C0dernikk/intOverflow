@@ -1,55 +1,30 @@
 import { Permission } from "node-appwrite";
-import {db, voteCollection } from "../name"
+import { db, voteCollection } from "../name";
 import { databases } from "./config";
 
-export default async function createVoteCollection(){
-    // Creating collection
-    await databases.createCollection({
-        databaseId: db,
-        collectionId: voteCollection,
-        name: voteCollection,
-        permissions: [
-            Permission.create("users"),
-            Permission.update("users")
-            Permission.delete("users")
-            Permission.read("any")
-        ]
-    })
+export default async function createVoteCollection() {
+    // Creating Collection
+    await databases.createCollection(db, voteCollection, voteCollection, [
+        Permission.create("users"),
+        Permission.read("any"),
+        Permission.read("users"),
+        Permission.update("users"),
+        Permission.delete("users"),
+    ]);
+    console.log("Vote Collection Created");
 
-    console.log("Vote Collection created")
-
-    // Creating attributes
-
+    // Creating Attributes
     await Promise.all([
-        databases.createEnumAttribute({
-            databaseId: db,
-            collectionId: voteCollection,
-            key: "type",
-            elements: ["questions", "answers"],
-            required: true
-        }),
-        databases.createEnumAttribute({
-            databaseId: db,
-            collectionId: voteCollection,
-            key: "voteStatus",
-            elements: ["upvoted", "downvoted"],
-            required: true
-        }),
-        databases.createStringAttribute({
-            databaseId: db,
-            collectionId: voteCollection,
-            key: "typeId",
-            size: 50,
-            required: true
-        }),
-        databases.createStringAttribute({
-            databaseId: db,
-            collectionId: voteCollection,
-            key: "votedById",
-            size: 50,
-            required: true
-        })
-    ])
-
-    console.log("Vote attribute created")
+        databases.createEnumAttribute(db, voteCollection, "type", ["question", "answer"], true),
+        databases.createStringAttribute(db, voteCollection, "typeId", 50, true),
+        databases.createEnumAttribute(
+            db,
+            voteCollection,
+            "voteStatus",
+            ["upvoted", "downvoted"],
+            true
+        ),
+        databases.createStringAttribute(db, voteCollection, "votedById", 50, true),
+    ]);
+    console.log("Vote Attributes Created");
 }

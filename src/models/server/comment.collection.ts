@@ -2,55 +2,23 @@ import { Permission } from "node-appwrite";
 import { commentCollection, db } from "../name";
 import { databases } from "./config";
 
-export default async function createCommentCollection(){
-    // Creating collection
-    await databases.createCollection({
-        databaseId: db,
-        collectionId: commentCollection,
-        name: commentCollection,
-        permissions: [
-            Permission.read("any"),
-            Permission.read("users"),
-            Permission.create("users"),
-            Permission.update("users"),
-            Permission.delete("users")
-        ]
-    })
+export default async function createCommentCollection() {
+    // Creating Collection
+    await databases.createCollection(db, commentCollection, commentCollection, [
+        Permission.create("users"),
+        Permission.read("any"),
+        Permission.read("users"),
+        Permission.update("users"),
+        Permission.delete("users"),
+    ]);
+    console.log("Comment Collection Created");
 
-    console.log("Comment collection created")
-
-    // Creating attributes
-
+    // Creating Attributes
     await Promise.all([
-        databases.createStringAttribute({
-            databaseId: db, 
-            collectionId: commentCollection,
-            key: "content",
-            size: 10000,
-            required: true
-        }),
-        databases.createStringAttribute({
-            databaseId: db,
-            collectionId: commentCollection,
-            key: "typeId",
-            size: 50,
-            required: true
-        }),
-        databases.createEnumAttribute({
-            databaseId: db,
-            collectionId: commentCollection,
-            key: "type",
-            elements: ["answers", "questions"],
-            required: true
-        }),
-        databases.createStringAttribute({
-            databaseId: db,
-            collectionId: commentCollection,
-            key: "authorId",
-            size: 50,
-            required: true
-        })
-    ])
-
-    console.log("Comment attributes created")
+        databases.createStringAttribute(db, commentCollection, "content", 10000, true),
+        databases.createEnumAttribute(db, commentCollection, "type", ["answer", "question"], true),
+        databases.createStringAttribute(db, commentCollection, "typeId", 50, true),
+        databases.createStringAttribute(db, commentCollection, "authorId", 50, true),
+    ]);
+    console.log("Comment Attributes Created");
 }
